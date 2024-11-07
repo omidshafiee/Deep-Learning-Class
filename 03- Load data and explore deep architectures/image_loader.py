@@ -1,8 +1,26 @@
 import os
 import shutil
+from zipfile import ZipFile
 
+def load_dogs_vs_cats(source_file, base_dir, clean_up=True):
+    # method return train_dir_cats, train_dir_dogs
 
-def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
+    temp_dir = base_dir + '-temp'
+
+    # must refactor later
+    original_dir = temp_dir
+
+    with ZipFile(source_file, 'r') as f:
+        #extract in current directory
+        f.extractall(path=temp_dir)
+
+    with ZipFile(os.path.join(temp_dir,'train.zip'), 'r') as f:
+        #extract in current directory
+        f.extractall(path=original_dir)
+
+    # if not os.path.exists(original_dir):
+    #     os.makedirs(original_dir)
+
 
     # train dataset directory
     train_dir = os.path.join(base_dir, 'train')
@@ -44,9 +62,9 @@ def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
 
     #  Cat images
     # copy first 1000 cat images into train cats directory
-    fnames = [f'cat.{i}.jpg' for i in range(1000)]
+    fnames = [f'cat.{i}.jpg' for i in range(1000)] 
     for fname in  fnames :
-        src = os.path.join(original_dir, fname)
+        src = os.path.join(original_dir, 'train', fname)
         dest = os.path.join(train_dir_cats, fname)
         shutil.copyfile(src, dest)
 
@@ -54,7 +72,7 @@ def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
     # copy 1000 to 1500 cat images into validation cats directory
     fnames = [f'cat.{i}.jpg' for i in range(1000, 1500)]
     for fname in  fnames :
-        src = os.path.join(original_dir, fname)
+        src = os.path.join(original_dir, 'train', fname)
         dest = os.path.join(validarion_dir_cats, fname)
         shutil.copyfile(src, dest)
 
@@ -62,16 +80,16 @@ def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
     # copy 1500 to 2000 cat images into test cats directory
     fnames = [f'cat.{i}.jpg' for i in range(1500, 2000)]
     for fname in  fnames :
-        src = os.path.join(original_dir, fname)
+        src = os.path.join(original_dir, 'train', fname)
         dest = os.path.join(test_dir_cats, fname)
         shutil.copyfile(src, dest)
 
 
-    # Dog Images    
+    # Dog Images
     # copy first 1000 cat images into train cats directory
     fnames = [f'dog.{i}.jpg' for i in range(1000)]
     for fname in  fnames :
-        src = os.path.join(original_dir, fname)
+        src = os.path.join(original_dir, 'train', fname)
         dest = os.path.join(train_dir_dogs, fname)
         shutil.copyfile(src, dest)
 
@@ -79,7 +97,7 @@ def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
     # copy 1000 to 1500 cat images into validation cats directory
     fnames = [f'dog.{i}.jpg' for i in range(1000, 1500)]
     for fname in  fnames :
-        src = os.path.join(original_dir, fname)
+        src = os.path.join(original_dir, 'train', fname)
         dest = os.path.join(validarion_dir_dogs, fname)
         shutil.copyfile(src, dest)
 
@@ -87,7 +105,7 @@ def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
     # copy 1500 to 2000 cat images into test cats directory
     fnames = [f'dog.{i}.jpg' for i in range(1500, 2000)]
     for fname in  fnames :
-        src = os.path.join(original_dir, fname)
+        src = os.path.join(original_dir, 'train', fname)
         dest = os.path.join(test_dir_dogs, fname)
         shutil.copyfile(src, dest)
 
@@ -102,6 +120,26 @@ def load_dogs_vs_cats(original_dir, base_dir, clean_up=True):
     print('total training dog images: ', len(os.listdir(train_dir_dogs)))
     print('total validation dog images: ', len(os.listdir(validarion_dir_dogs)))
     print('total test dog images: ', len(os.listdir(test_dir_dogs)))
- 
-    # if clean_up:
-        # os.path.join(original_dir, 'dogs_vs_cats.zip')
+
+    if clean_up:
+        shutil.rmtree(path=temp_dir)
+
+
+    return train_dir, validation_dir, test_dir
+
+
+def get_data_location(base_dir):
+    # train dataset directory
+    train_dir = os.path.join(base_dir, 'train')
+
+    # validation dataset directory
+    validation_dir = os.path.join(base_dir, 'validation')
+
+    # test dataset directory
+    test_dir = os.path.join(base_dir, 'test')
+
+    return train_dir, validation_dir, test_dir
+
+
+
+# load_dogs_vs_cats(source_file=source_file, base_dir=base_dir)
